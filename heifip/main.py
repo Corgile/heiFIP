@@ -1,19 +1,10 @@
-import asyncio
-import fnmatch
-import glob
-import logging
 import os
-from os.path import dirname, realpath
 from queue import Queue
 from threading import Thread
 
-from PIL import Image as PILImage
 from tqdm import tqdm
 
 from heifip.extractor import FIPExtractor
-from heifip.images.flow import FlowImage
-
-import pickle
 
 
 class Runner:
@@ -59,8 +50,10 @@ class Runner:
         # Get all executable files in input directory and add them into queue
         file_queue = Queue()
         total_files = 0
+        extensions = ('.pcap', '.pcapng', '.cap')
         for root, dirnames, filenames in os.walk(input_dir):
-            for filename in fnmatch.filter(filenames, "*.pcap"):
+            filenames = filter(lambda f: f.endswith(extensions), filenames)
+            for filename in filenames:
                 match = os.path.join(root, filename)
                 sub_dir = match.replace(input_dir, "")
                 file_queue.put((match, f"{output_dir}/{sub_dir}"))
